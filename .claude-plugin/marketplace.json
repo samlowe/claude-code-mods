@@ -1,0 +1,11 @@
+{
+  "name": "claude-code-mods",
+  "owner": { "name": "Sam Lowe" },
+  "plugins": [
+    {
+      "name": "open",
+      "source": "./mods/open",
+      "description": "/open: like /copy, but writes the last response to a temp .md file and opens it in the default app"
+    }
+  ]
+}

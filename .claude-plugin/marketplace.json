@@ -5,7 +5,7 @@
     {
       "name": "open",
       "source": "./mods/open",
-      "description": "/open: like /copy, but writes the last response to a temp .md file and opens it in the default app"
+      "description": "/open: like /copy, but writes the last response to a temp .md file and opens it in the default app; or opens a given data or document file"
     }
   ]
 }

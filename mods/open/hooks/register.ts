@@ -3,7 +3,28 @@ import type { Register } from 'claude-code'
 // Platform openers, tried in order until one starts and exits 0.
 const OPENERS: readonly string[] = ['xdg-open', 'open', 'wslview']
 
-const MD_FILE = /\.(md|markdown)$/i
+// File types `/open <file>` will open: data and content only. Deliberately
+// absent: anything executable or scripted (sh, py, js, exe, app, desktop, ...),
+// archives (their contents may be executable), and html/svg (they run script
+// when rendered).
+const OPENABLE: ReadonlySet<string> = new Set([
+  // text and data
+  'md', 'markdown', 'txt', 'text', 'log', 'csv', 'tsv', 'json', 'yaml', 'yml',
+  'toml', 'xml',
+  // documents
+  'pdf', 'rtf', 'odt', 'doc', 'docx', 'pages', 'epub',
+  // spreadsheets and slides
+  'xls', 'xlsx', 'ods', 'ppt', 'pptx', 'odp', 'key',
+  // images
+  'png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'tif', 'tiff', 'heic',
+  // audio and video
+  'mp3', 'm4a', 'wav', 'flac', 'ogg', 'opus', 'aac', 'mp4', 'm4v', 'mov', 'mkv',
+  'webm', 'avi',
+])
+
+// The lower-cased extension of a path, or undefined if it has none.
+const extensionOf = (path: string): string | undefined =>
+  path.match(/\.([^./]+)$/)?.[1]?.toLowerCase()
 
 const unquote = (s: string): string =>
   /^(["']).*\1$/.test(s) ? s.slice(1, -1).trim() : s
@@ -21,8 +42,8 @@ export const register: Register = on => {
     await $.command.register({
       name: 'open',
       description:
-        "Open Claude's last response, or a given .md file, in the default app",
-      argumentHint: '[@file.md]',
+        "Open Claude's last response, or a given file, in the default app",
+      argumentHint: '[@file]',
     })
 
     return next(e)
@@ -44,8 +65,9 @@ export const register: Register = on => {
     const requested = cleanPath(e.args)
 
     if (requested !== '') {
-      if (!MD_FILE.test(requested)) {
-        return { text: `Not a markdown file (.md): ${requested}` }
+      const ext = extensionOf(requested)
+      if (ext === undefined || !OPENABLE.has(ext)) {
+        return { text: `Not a file type /open can open: ${requested}` }
       }
       let path = requested
       if (path === '~' || path.startsWith('~/')) {

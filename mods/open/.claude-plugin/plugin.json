@@ -1,6 +1,6 @@
 {
   "name": "open",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "license": "MIT",
-  "description": "/open: like /copy, but writes the last response to a temp markdown file and opens it in the default app"
+  "description": "/open: like /copy, but writes the last response to a temp markdown file and opens it in the default app; or opens a given data or document file"
 }
